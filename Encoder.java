@@ -1,5 +1,4 @@
 import nayuki.huffmancoding.*;
-
 import java.io.*;
 import java.util.*;
 import java.lang.*;
@@ -9,27 +8,72 @@ public class Encoder{
   public static void main(String args[]) throws Exception{
 
       Scanner scan = new Scanner(new File(args[0]));
-
+      /*get frequencies from txt*/
       ArrayList<Integer> frequencies = getFrequencies(scan);
-
+      int[] longFrequency = new int[257];
+      for (int i= 0; i < frequencies.size(); i++){
+        longFrequency[i+97]=frequencies.get(i);
+      }
+      /*calculate sum of all frequencies*/
+      int _sum = sum(frequencies);
+      /*turn arraylist into array*/
       int[] test = getArray(frequencies);
+      /*entrop*/
+      System.out.println("entropy: " + getH(frequencies, _sum));
       
 
 
       /*testing Huffman code found online*/
-      FrequencyTable _table = new FrequencyTable(test);
+      FrequencyTable _table = new FrequencyTable(longFrequency);
+      _table.increment(256);
       CodeTree tree = _table.buildCodeTree();
+
       textGenerator(test);
-      System.out.println(tree.toString());
+      System.out.println("printing code tree: " + tree.toString());
 
 
+      /*compress*/
+      BitOutputStream bitOutput = new BitOutputStream(new FileOutputStream("testText.enc1"));
+      HuffmanEncoder huffmanEncoder = new HuffmanEncoder(bitOutput);
+      InputStream input = new FileInputStream("testText");
+      compress(tree, input, bitOutput, huffmanEncoder);
+      input.close();
+      bitOutput.close();
+
+      /*decompress*/
+      BitInputStream input_Decode = new BitInputStream(new FileInputStream("testText.enc1"));
+      OutputStream output_Decode = new FileOutputStream("testText.dec1");
+      HuffmanDecoder decoder = new HuffmanDecoder(input_Decode);
+      decompress(tree, input_Decode, output_Decode, decoder);
+      input_Decode.close();
+      output_Decode.close();
+
+      System.out.println("test frequency table\n: " + _table.toString());
 
 
+      
+  }
+  public static void decompress(CodeTree codetree, BitInputStream input, OutputStream bitOutput
+    ,HuffmanDecoder huffman)throws IOException{
+    int symbol;
+    huffman.codeTree=codetree;
+    while((symbol = huffman.read()) != -1){
+      //System.out.println("DEBUG: "+symbol);
+      if (symbol == 256)
+        break;
+      bitOutput.write(symbol);
+    }
 
-      System.out.println("test frequency table: " + _table.toString());
+  }
 
-      //System.out.println("entropy: " + getH(frequencies, frequencies.get(frequencies.size() - 1)));
-      //Math.log(x) / Math.log(2)
+  public static void compress(CodeTree codetree, InputStream input, BitOutputStream bitOutput
+    ,HuffmanEncoder huffman)throws IOException{
+    int symbol;
+    huffman.codeTree=codetree;
+    while((symbol = input.read()) != -1){
+      huffman.write(symbol);
+    }
+    huffman.write(256);
   }
 
   public static void textGenerator(int[] data)throws IOException{
@@ -43,28 +87,18 @@ public class Encoder{
     }
     System.out.println("testing array frequencies: " + randomList);
 
-    //int rangepoint = letterFrequency[0]  if(rand >= 0 && rand < lF[0]) `
-
-    //StringBuilder text = new StringBuilder();
     Random r = new Random();
     Writer output = new FileWriter("testText");
     OutputStream out = new FileOutputStream("testText");
     for (int i = 0; i < 10000; i++){
-
-        //text.append(randomList.get(r.nextInt(randomList.size())));
         out.write(randomList.get(r.nextInt(randomList.size())).getBytes());
     }
-
-
-   // output.write(text.toString());
-
-
   }
 
-  public static int sum(int endpoint, int[] data){
+  public static int sum(ArrayList<Integer> data){
     int sum = 0;
-    for (int i = 0; i < endpoint; i++){
-        sum += data[i];
+    for (int i = 0; i < data.size(); i++){
+        sum += data.get(i);
     }
     return sum;
   }
@@ -84,15 +118,13 @@ public class Encoder{
   
     ArrayList<Integer> data = new ArrayList<Integer>();
 
-    int total = 0, temp=0;
+    int total = 0, symbol=0;
 
     while (scan.hasNext()){
-      temp = scan.nextInt();
-      total+=temp;
-      data.add(temp);
+      symbol = scan.nextInt();
+      total+=symbol;
+      data.add(symbol);
     }
-    /*total count of characters is inserted at end of arrayList*/
-    //data.add(total);
     System.out.println(data);
 
    
@@ -103,7 +135,7 @@ public class Encoder{
       double h = 0;
       for (int i = 0; i < data.size() - 1; i++){
           int val = data.get(i);
-          h+= (1.0*val/denominator) * (Math.log(val)/Math.log(2));
+          h+= (1.0*val/denominator)*(Math.log(val)/Math.log(2));
       }
       return h;
 

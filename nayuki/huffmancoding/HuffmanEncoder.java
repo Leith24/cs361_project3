@@ -27,6 +27,7 @@ public final class HuffmanEncoder {
 			throw new NullPointerException("Code tree is null");
 		
 		List<Integer> bits = codeTree.getCode(symbol);
+		System.out.println(symbol + ", " + bits);
 		for (int b : bits)
 			output.write(b);
 	}
