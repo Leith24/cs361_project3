@@ -48,7 +48,7 @@ public class Encoder{
       input_Decode.close();
       output_Decode.close();
 
-      System.out.println("test frequency table\n: " + _table.toString());
+   //   System.out.println("test frequency table\n: " + _table.toString());
 
 
       
@@ -85,7 +85,7 @@ public class Encoder{
        for (int j = 0; j < data[i]; j++)
           randomList.add("" + (char)(i + 97));
     }
-    System.out.println("testing array frequencies: " + randomList);
+//    System.out.println("testing array frequencies: " + randomList);
 
     Random r = new Random();
     Writer output = new FileWriter("testText");
@@ -125,7 +125,7 @@ public class Encoder{
       total+=symbol;
       data.add(symbol);
     }
-    System.out.println(data);
+    //System.out.println(data);
 
    
     return data;
