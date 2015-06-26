@@ -49,13 +49,14 @@ public class Encoder{
       output_Decode.close();
 
    //   System.out.println("test frequency table\n: " + _table.toString());
+      System.out.println("Encoding 1: \n"+tree);
       System.out.println("entropy: " + getH(frequencies, _sum));
-      System.out.println("bits/symbol: " + averageBits(tree, longFrequency));
+      System.out.println("bits/symbol: " + averageBits(tree, longFrequency,getArray(frequencies))+"\n");
 
       ArrayList<Integer> doubleAlph = new ArrayList<Integer>();
       /*double alphabet*/
       _sum = sum(frequencies);
-      System.out.println("sum: "+_sum);
+      //System.out.println("sum: "+_sum);
 
       for(int i = 0; i < frequencies.size(); i++)
           for (int j = 0; j < frequencies.size(); j++)
@@ -81,13 +82,14 @@ public class Encoder{
       decompress(tree, doubleInput_Decode, doubleOutput_Decode, doubleDecoder);
       doubleInput_Decode.close();
       doubleOutput_Decode.close();
-      System.out.println(doubleAlph);
-      System.out.println("entropy: " + getH(doubleAlph, _sum));
-      System.out.println("bits/symbol: " + averageBits(tree, longFrequency));
+      //System.out.println(doubleAlph);
+      System.out.println("Encoding 2: \n"+tree);
+      System.out.println("2 Symbol entropy: " + getH(doubleAlph, sum(doubleAlph)));
+      System.out.println("2 Symbol bits/symbol: " + averageBits(tree, longFrequency,getArray(doubleAlph)));
 
   }
 
-  public static double averageBits(CodeTree tree, int[] frequencies){
+  public static double averageBits(CodeTree tree, int[] frequencies, int[]freqCount){
       double sum = 0;
       int count = 0;
       for (int i = 0 ; i< frequencies.length;i++){
@@ -97,7 +99,7 @@ public class Encoder{
             count++;
           }
       }
-      return 1.0*sum/count;
+      return 1.0*sum/(freqCount.length);
 
   }
 
@@ -133,7 +135,7 @@ public class Encoder{
       for(int k = 0; k < data.length; k++){
          for (int j = 0; j < other[i]; j++)
             randomList.add("" + (char)(i + 97)+(char)(k+97));
-          System.out.println((char)(i + 97)+ " " + (char)(k+97));
+          //System.out.println((char)(i + 97)+ " " + (char)(k+97));
       }
     }
 
@@ -203,6 +205,7 @@ public class Encoder{
 
   public static double getH(ArrayList<Integer> data, int denominator){
       double h = 0;
+      //System.out.println("denom: "+denominator);
       for (int i = 0; i < data.size() - 1; i++){
           int val = data.get(i);
           h+= (1.0*val/denominator)*(Math.log(val)/Math.log(2));
