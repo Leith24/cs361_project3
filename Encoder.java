@@ -28,7 +28,7 @@ public class Encoder{
       _table.increment(256);
       CodeTree tree = _table.buildCodeTree();
 
-      textGenerator(test);
+      textGenerator(test, "testText");
       //System.out.println("printing code tree: " + tree.toString());
 
 
@@ -56,15 +56,35 @@ public class Encoder{
       /*double alphabet*/
       _sum = sum(frequencies);
       System.out.println("sum: "+_sum);
-      for(int i = 0; i < frequencies.size(); i++){
 
-          for (int j = 0; j < frequencies.size(); j++){
-              System.out.println(frequencies.get(i) + ", " + frequencies.get(j));
+      for(int i = 0; i < frequencies.size(); i++)
+          for (int j = 0; j < frequencies.size(); j++)
               doubleAlph.add( (int)Math.floor((1.0*frequencies.get(i)/_sum) * (1.0*frequencies.get(j)/_sum)*100) );
-          }
-      }
+          
+      
 
-      System.out.println("getting double frequencies: " + doubleAlph);
+      //System.out.println("getting double frequencies: " + doubleAlph);
+      doubleTextGenerator(test, getArray(doubleAlph),"doubleTestText");
+
+      /*compress*/
+      BitOutputStream doubleBitOutput = new BitOutputStream(new FileOutputStream("doubleTestText.enc1"));
+      HuffmanEncoder doubleHuffmanEncoder = new HuffmanEncoder(doubleBitOutput);
+      InputStream doubleInput = new FileInputStream("doubleTestText");
+      compress(tree, doubleInput, doubleBitOutput, doubleHuffmanEncoder);
+      doubleInput.close();
+      doubleBitOutput.close();
+
+       /*decompress*/
+      BitInputStream doubleInput_Decode = new BitInputStream(new FileInputStream("doubleTestText.enc1"));
+      OutputStream doubleOutput_Decode = new FileOutputStream("doubleTestText.dec1");
+      HuffmanDecoder doubleDecoder = new HuffmanDecoder(doubleInput_Decode);
+      decompress(tree, doubleInput_Decode, doubleOutput_Decode, doubleDecoder);
+      doubleInput_Decode.close();
+      doubleOutput_Decode.close();
+      System.out.println(doubleAlph);
+      System.out.println("entropy: " + getH(doubleAlph, _sum));
+      System.out.println("bits/symbol: " + averageBits(tree, longFrequency));
+
   }
 
   public static double averageBits(CodeTree tree, int[] frequencies){
@@ -104,7 +124,30 @@ public class Encoder{
     huffman.write(256);
   }
 
-  public static void textGenerator(int[] data)throws IOException{
+  public static void doubleTextGenerator(int[] data, int[] other, String input)throws IOException{
+
+      ArrayList<String> randomList = new ArrayList<String>();
+
+
+    for (int i = 0 ; i < data.length; i++){
+      for(int k = 0; k < data.length; k++){
+         for (int j = 0; j < other[i]; j++)
+            randomList.add("" + (char)(i + 97)+(char)(k+97));
+          System.out.println((char)(i + 97)+ " " + (char)(k+97));
+      }
+    }
+
+    Random r = new Random();
+    OutputStream out = new FileOutputStream(input);
+    for (int i = 0; i < 10000; i++){
+        out.write(randomList.get(r.nextInt(randomList.size())).getBytes());
+    }
+   
+
+
+  }
+
+  public static void textGenerator(int[] data, String input)throws IOException{
     
     ArrayList<String> randomList = new ArrayList<String>();
 
@@ -116,8 +159,7 @@ public class Encoder{
 //    System.out.println("testing array frequencies: " + randomList);
 
     Random r = new Random();
-    Writer output = new FileWriter("testText");
-    OutputStream out = new FileOutputStream("testText");
+    OutputStream out = new FileOutputStream(input);
     for (int i = 0; i < 10000; i++){
         out.write(randomList.get(r.nextInt(randomList.size())).getBytes());
     }
