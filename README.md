@@ -9,6 +9,8 @@ http://www.nayuki.io/page/huffman-coding-java
 
 Description:
 
+In our assignment we used the huffmann code from the link given above. We read in a file (for this example, frequencies) and assign it to an Integer ArrayList. We make a longFrequency array to be able to print out ASCII characters by making the longFrequency array size 257. We then place this array into the huffmann code's Frequency table class. With this new table, we create a code tree that assigns binary encoding to each symbol. Then, using the original ArrayList of frequncies, we generate a text file of random symbols (only those given by our input) to make a file of 10,000 characters. After these are all created, we used the huffmann encoding files to encode our original random text (testText) into testText.enc1. After, we decode this binary file into testText.dec1. We then close the input and output files and calculate the entropy and bits/symbol of this encoding. Finally, we repeat this process for 2 symbol encoding. However, in this iteration, our symbols are not listed by ASCII symbol values in the tree. They are instead listed as the symbol count (ie 0,1,2,3 etc.). The encoding and decoding process, however, is the same as the single symbol encoding.
+
 Finished: We finished the assignment.
 
 Test Case: 
