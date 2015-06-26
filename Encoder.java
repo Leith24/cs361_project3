@@ -19,7 +19,7 @@ public class Encoder{
       /*turn arraylist into array*/
       int[] test = getArray(frequencies);
       /*entrop*/
-      System.out.println("entropy: " + getH(frequencies, _sum));
+      
       
 
 
@@ -29,7 +29,7 @@ public class Encoder{
       CodeTree tree = _table.buildCodeTree();
 
       textGenerator(test);
-      System.out.println("printing code tree: " + tree.toString());
+      //System.out.println("printing code tree: " + tree.toString());
 
 
       /*compress*/
@@ -49,10 +49,26 @@ public class Encoder{
       output_Decode.close();
 
    //   System.out.println("test frequency table\n: " + _table.toString());
-
+      System.out.println("entropy: " + getH(frequencies, _sum));
+      System.out.println("bits/symbol: " + averageBits(tree, longFrequency));
 
       
   }
+
+  public static double averageBits(CodeTree tree, int[] frequencies){
+      double sum = 0;
+      int count = 0;
+      for (int i = 0 ; i< frequencies.length;i++){
+
+          if(frequencies[i]>0){
+            sum+=tree.getCode(i).size();
+            count++;
+          }
+      }
+      return 1.0*sum/count;
+
+  }
+
   public static void decompress(CodeTree codetree, BitInputStream input, OutputStream bitOutput
     ,HuffmanDecoder huffman)throws IOException{
     int symbol;
