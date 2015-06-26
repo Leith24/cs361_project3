@@ -68,6 +68,9 @@ public class Encoder{
       doubleTextGenerator(test, getArray(doubleAlph),"doubleTestText");
 
       /*compress*/
+      FrequencyTable table2 = new FrequencyTable(getArray(doubleAlph));
+      CodeTree tree2 = table2.buildCodeTree();
+      //System.out.println(tree2);
       BitOutputStream doubleBitOutput = new BitOutputStream(new FileOutputStream("doubleTestText.enc1"));
       HuffmanEncoder doubleHuffmanEncoder = new HuffmanEncoder(doubleBitOutput);
       InputStream doubleInput = new FileInputStream("doubleTestText");
@@ -83,9 +86,9 @@ public class Encoder{
       doubleInput_Decode.close();
       doubleOutput_Decode.close();
       //System.out.println(doubleAlph);
-      System.out.println("Encoding 2: \n"+tree);
+      System.out.println("Encoding 2: \n"+tree2);
       System.out.println("2 Symbol entropy: " + getH(doubleAlph, sum(doubleAlph)));
-      System.out.println("2 Symbol bits/symbol: " + averageBits(tree, longFrequency,getArray(doubleAlph)));
+      System.out.println("2 Symbol bits/symbol: " + averageBits(tree2, getArray(doubleAlph),getArray(doubleAlph)));
 
   }
 
@@ -93,7 +96,7 @@ public class Encoder{
       double sum = 0;
       int count = 0;
       for (int i = 0 ; i< frequencies.length;i++){
-
+          //System.out.println("DEBUG: "+i);
           if(frequencies[i]>0){
             sum+=tree.getCode(i).size();
             count++;
@@ -135,7 +138,7 @@ public class Encoder{
       for(int k = 0; k < data.length; k++){
          for (int j = 0; j < other[i]; j++)
             randomList.add("" + (char)(i + 97)+(char)(k+97));
-          //System.out.println((char)(i + 97)+ " " + (char)(k+97));
+         // System.out.println((char)(i + 97)+ " " + (char)(k+97));
       }
     }
 
@@ -206,10 +209,18 @@ public class Encoder{
   public static double getH(ArrayList<Integer> data, int denominator){
       double h = 0;
       //System.out.println("denom: "+denominator);
+      //System.out.println("pringin array: " + data);
       for (int i = 0; i < data.size() - 1; i++){
           int val = data.get(i);
-          h+= (1.0*val/denominator)*(Math.log(val)/Math.log(2));
+        //  System.out.print(val);
+        //  System.out.println(" "+denominator);
+          if(val != 0){
+            h+= (1.0*val/denominator)*(Math.log(((1.0*val)/denominator))/Math.log(2));
+          }
+          //System.out.println(h);
       }
+
+      h *= -1.0;
       return h;
 
 
