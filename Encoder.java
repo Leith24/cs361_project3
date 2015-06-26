@@ -52,7 +52,19 @@ public class Encoder{
       System.out.println("entropy: " + getH(frequencies, _sum));
       System.out.println("bits/symbol: " + averageBits(tree, longFrequency));
 
-      
+      ArrayList<Integer> doubleAlph = new ArrayList<Integer>();
+      /*double alphabet*/
+      _sum = sum(frequencies);
+      System.out.println("sum: "+_sum);
+      for(int i = 0; i < frequencies.size(); i++){
+
+          for (int j = 0; j < frequencies.size(); j++){
+              System.out.println(frequencies.get(i) + ", " + frequencies.get(j));
+              doubleAlph.add( (int)Math.floor((1.0*frequencies.get(i)/_sum) * (1.0*frequencies.get(j)/_sum)*100) );
+          }
+      }
+
+      System.out.println("getting double frequencies: " + doubleAlph);
   }
 
   public static double averageBits(CodeTree tree, int[] frequencies){
